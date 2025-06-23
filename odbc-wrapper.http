@@ -1,0 +1,17 @@
+@odbc_wrapper_HostAddress = http://localhost:5018
+
+POST {{odbc_wrapper_HostAddress}}/query
+Content-Type: text/plain
+Accept: application/json
+
+SELECT * FROM [ZAKAZKA NEW] WHERE [ID] = 2;
+
+###
+
+POST {{odbc_wrapper_HostAddress}}/query
+Content-Type: text/plain
+Accept: application/json
+
+UPDATE [ZAKAZKA NEW] SET ID = 4 WHERE [ID1] = 12300;
+
+###

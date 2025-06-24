@@ -19,3 +19,7 @@ This project is a .NET 9 Web API server that exposes a REST API endpoint. It acc
 
 ## Security Warning
 **Do not expose this API to untrusted networks without proper authentication and input validation. Executing arbitrary SQL is dangerous!**
+
+## Publish
+
+    dotnet publish -c Release -r win-x86 --self-contained false -o ./publish

@@ -1,3 +1,4 @@
+using System.Data;
 using System.Data.Odbc;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,9 +23,12 @@ app.MapPost("/query", async (HttpRequest request) =>
     if (string.IsNullOrWhiteSpace(sql))
         return Results.BadRequest("SQL query is required in the request body.");
 
+    Console.WriteLine($"Received SQL query: {sql}");
+
     var connectionString = config["Odbc:ConnectionString"] ?? "";
     if (string.IsNullOrWhiteSpace(connectionString))
         return Results.Problem("ODBC connection string is not configured.");
+
     try
     {
         using var connection = new OdbcConnection(connectionString);
@@ -49,7 +53,8 @@ app.MapPost("/query", async (HttpRequest request) =>
         var result = new
         {
             columns,
-            rows
+            rows,
+            recordsAffected = dataReader.RecordsAffected
         };
         return Results.Ok(result);
     }
@@ -59,5 +64,31 @@ app.MapPost("/query", async (HttpRequest request) =>
     }
 })
 .WithName("ExecuteSqlQuery");
+
+app.MapGet("/tables", async () =>
+{
+    var connectionString = config["Odbc:ConnectionString"] ?? "";
+    if (string.IsNullOrWhiteSpace(connectionString))
+        return Results.Problem("ODBC connection string is not configured.");
+
+    try
+    {
+        using var connection = new OdbcConnection(connectionString);
+        await connection.OpenAsync();
+        // Restrict to TABLE type only
+        DataTable tables = connection.GetSchema("Tables");
+        var tableNames = new List<string>();
+        foreach (DataRow row in tables.Rows)
+        {
+            // Table name is in the "TABLE_NAME" column
+            tableNames.Add(row["TABLE_NAME"].ToString());
+        }
+        return Results.Ok(tableNames);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"Error retrieving tables: {ex.Message}");
+    }
+});
 
 app.Run();

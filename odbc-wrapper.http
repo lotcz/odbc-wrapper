@@ -1,10 +1,20 @@
-@odbc_wrapper_HostAddress = http://localhost:5018
+@odbc_wrapper_HostAddress = http://localhost:8079
+
+GET {{odbc_wrapper_HostAddress}}/tables
+Content-Type: text/plain
+Accept: application/json
+
+###
 
 POST {{odbc_wrapper_HostAddress}}/query
 Content-Type: text/plain
 Accept: application/json
 
-SELECT * FROM [ZAKAZKA NEW] WHERE [ID] = 2;
+select * from (
+    select top 10 * from (
+        select top 60 * from [ADRFIREM Tabulka] order by [E mail] ASC
+    ) order by [E mail] DESC
+) order by [E mail] ASC
 
 ###
 
@@ -13,5 +23,22 @@ Content-Type: text/plain
 Accept: application/json
 
 UPDATE [ZAKAZKA NEW] SET ID = 4 WHERE [ID1] = 12300;
+
+###
+
+POST {{odbc_wrapper_HostAddress}}/query
+Content-Type: text/plain
+Accept: application/json
+
+update [ADRFIREM Tabulka] set [TEL2] = '0602/684975',
+[PSC] = '12000',
+[TEL1] = '25096222-5',
+[STAT] = '?R',
+[ICO] = '00540811',
+[ULICE] = 'Blanická 25',
+[E mail] = 'remin@terminal.cz',
+[FAX] = '22253677',
+[FIRMA] = 'REMINA spol. s r.o.'
+where [IDFY] = 1
 
 ###
